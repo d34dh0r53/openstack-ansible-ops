@@ -36,7 +36,6 @@ mnaio_host_distro_packages:
   - openssh-server
   - python2.7
   - python-lxml
-  - python-software-properties
   - qemu-kvm
   - qemu-utils
   - software-properties-common
