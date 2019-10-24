@@ -62,12 +62,12 @@ if [[ ${PYTHON_INTERPRETER,,} == "distro" ]]; then
 elif [[ ${PYTHON_INTERPRETER,,} == "pyenv" ]]; then
     case "${ID,,}" in
         ubuntu|debian)
-            sudo apt-get install -y libssl1.0-dev libsqlite3-dev
-            sudo curl https://pyenv.run | bash
-            sudo source pyenv-env.rc
-            sudo pyenv install ${PYENV_VERSION}
-            sudo pyenv global ${PYENV_VERSION}
-            sudo pip install -U pip
+            apt-get install -y libssl1.0-dev libsqlite3-dev
+            curl https://pyenv.run | bash
+            source pyenv-env.rc
+            pyenv install ${PYENV_VERSION}
+            pyenv global ${PYENV_VERSION}
+            pip install -U pip
             ;;
         *)
             echo "Unsupported distribution: ${ID,,}"
