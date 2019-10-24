@@ -1,0 +1,3 @@
+export PATH="/root/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+export ANSIBLE_PYTHON=/root/.pyenv/shims/python

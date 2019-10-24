@@ -18,42 +18,65 @@ set -euo
 
 BINDEP_FILE=${BINDEP_FILE:-bindep.txt}
 
+# Allow user to specify OS distro python packages or install
+# the pyenv version specified. PYTHON_INTERPRETER can be either
+# distro (default) or pyenv. PYENV_VERSION can be any python 
+# version available to pyenv default is 3.5.2
+export PYTHON_INTERPRETER=${PYTHON_INTERPRETER:-distro}
+export PYENV_VERSION=${PYENV_VERSION:-3.5.2}
+
 # We use the OSA branch variable to pin both the plugins
 # and the ansible version used to work together.
 # TODO(odyssey4me):
 # Switch this to use the master branch once the following
 # bug is fixed.
 # https://github.com/ansible/ansible/issues/47301
-export OSA_DEPS_BRANCH=${OSA_DEPS_BRANCH:-stable/rocky}
+export OSA_DEPS_BRANCH=${OSA_DEPS_BRANCH:-stable/stein}
 
 source /etc/os-release || source /usr/lib/os-release
 
-case "${ID,,}" in
-    *suse*)
-        # Need to pull libffi and python-pyOpenSSL early
-        # because we install ndg-httpsclient from pip on Leap 42.1
-        [[ "${VERSION}" == "42.1" ]] && extra_suse_deps="libffi-devel python-pyOpenSSL"
-        sudo zypper -n in python-devel lsb-release ${extra_suse_deps:-}
-        ;;
-    amzn|centos|rhel)
-        sudo yum install -y python-devel redhat-lsb-core
-        ;;
-    ubuntu|debian)
-        sudo apt-get update && sudo apt-get install -y python-dev lsb-release
-        ;;
-    *)
-        echo "Unsupported distribution: ${ID,,}"
-        exit 1
-esac
+if [[ ${PYTHON_INTERPRETER,,} == "distro" ]]; then
+    case "${ID,,}" in
+        *suse*)
+            # Need to pull libffi and python-pyOpenSSL early
+            # because we install ndg-httpsclient from pip on Leap 42.1
+            [[ "${VERSION}" == "42.1" ]] && extra_suse_deps="libffi-devel python-pyOpenSSL"
+            sudo zypper -n in python-devel lsb-release ${extra_suse_deps:-}
+            ;;
+        amzn|centos|rhel)
+            sudo yum install -y python-devel redhat-lsb-core
+            ;;
+        ubuntu|debian)
+            sudo apt-get update && sudo apt-get install -y python-dev lsb-release
+            ;;
+        *)
+            echo "Unsupported distribution: ${ID,,}"
+            exit 1
+    esac
 
-# Install pip
-if ! which pip &>/dev/null; then
-    curl --silent --show-error --retry 5 \
-        https://bootstrap.pypa.io/3.2/get-pip.py | sudo python2.7
+    # Install pip
+    if ! which pip &>/dev/null; then
+        curl --silent --show-error --retry 5 \
+            https://bootstrap.pypa.io/3.2/get-pip.py | sudo python2.7
+    fi
+elif [[ ${PYTHON_INTERPRETER,,} == "pyenv" ]]; then
+    case "${ID,,}" in
+        ubuntu|debian)
+            sudo apt-get install -y libssl1.0-dev libsqlite3-dev
+            sudo curl https://pyenv.run | bash
+            sudo source pyenv-env.rc
+            sudo pyenv install ${PYENV_VERSION}
+            sudo pyenv global ${PYENV_VERSION}
+            sudo pip install -U pip
+            ;;
+        *)
+            echo "Unsupported distribution: ${ID,,}"
+            exit 1
+    esac
 fi
 
 # Install bindep and tox
-sudo pip install 'bindep>=2.4.0' tox
+sudo pip install 'bindep>=2.4.0' tox setuptools
 
 # CentOS 7 requires two additional packages:
 #   redhat-lsb-core - for bindep profile support
