@@ -62,7 +62,7 @@ if [[ ${PYTHON_INTERPRETER,,} == "distro" ]]; then
 elif [[ ${PYTHON_INTERPRETER,,} == "pyenv" ]]; then
     case "${ID,,}" in
         ubuntu|debian)
-            apt-get install -y libssl1.0-dev libsqlite3-dev
+            apt-get install -y libssl1.0-dev libsqlite3-dev build-essential
             curl https://pyenv.run | bash
             source pyenv-env.rc
             pyenv install ${PYENV_VERSION}
