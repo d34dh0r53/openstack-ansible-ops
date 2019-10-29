@@ -59,6 +59,8 @@ if [[ ${PYTHON_INTERPRETER,,} == "distro" ]]; then
         curl --silent --show-error --retry 5 \
             https://bootstrap.pypa.io/3.2/get-pip.py | sudo python2.7
     fi
+    # Install bindep and tox
+    sudo pip install 'bindep>=2.4.0' tox setuptools
 elif [[ ${PYTHON_INTERPRETER,,} == "pyenv" ]]; then
     case "${ID,,}" in
         ubuntu|debian)
@@ -68,6 +70,7 @@ elif [[ ${PYTHON_INTERPRETER,,} == "pyenv" ]]; then
             pyenv install ${PYENV_VERSION}
             pyenv global ${PYENV_VERSION}
             pip install -U pip
+            pip install 'bindep>=2.4.0' tox setuptools
             ;;
         *)
             echo "Unsupported distribution: ${ID,,}"
@@ -75,8 +78,6 @@ elif [[ ${PYTHON_INTERPRETER,,} == "pyenv" ]]; then
     esac
 fi
 
-# Install bindep and tox
-sudo pip install 'bindep>=2.4.0' tox setuptools
 
 # CentOS 7 requires two additional packages:
 #   redhat-lsb-core - for bindep profile support
