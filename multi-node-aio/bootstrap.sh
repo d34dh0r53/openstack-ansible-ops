@@ -20,10 +20,11 @@ BINDEP_FILE=${BINDEP_FILE:-bindep.txt}
 
 # Allow user to specify OS distro python packages or install
 # the pyenv version specified. PYTHON_INTERPRETER can be either
-# distro (default) or pyenv. PYENV_VERSION can be any python 
+# distro (default) or pyenv. PYENV_VERSION can be any python
 # version available to pyenv default is 3.5.2
 export PYTHON_INTERPRETER=${PYTHON_INTERPRETER:-distro}
 export PYENV_VERSION=${PYENV_VERSION:-3.5.2}
+export PYENV_FORCE=${PYENV_FORCE:-false}
 
 # We use the OSA branch variable to pin both the plugins
 # and the ansible version used to work together.
@@ -116,7 +117,13 @@ if [[ ${#BINDEP_PKGS} > 0 ]]; then
 fi
 
 # Install latest OSA supported Ansible version
-sudo pip install -r https://opendev.org/openstack/openstack-ansible-tests/raw/branch/${OSA_DEPS_BRANCH}/test-ansible-deps.txt
+if [[ ${PYTHON_INTERPRETER,,} == "distro" ]]; then
+    sudo pip install -r https://opendev.org/openstack/openstack-ansible-tests/raw/branch/${OSA_DEPS_BRANCH}/test-ansible-deps.txt
+elif [[ ${PYTHON_INTERPRETER,,} == "pyenv" ]]; then
+    pip install -r https://opendev.org/openstack/openstack-ansible-tests/raw/branch/${OSA_DEPS_BRANCH}/test-ansible-deps.txt
+fi
+
+
 
 # Get the latest OSA plugins
 # This is used to allow access from the MNAIO host to
