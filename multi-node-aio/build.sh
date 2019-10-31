@@ -22,11 +22,6 @@ source ansible-env.rc
 ansible vm_hosts \
         -i ${MNAIO_INVENTORY:-"playbooks/inventory"} \
         -m pip \
-        -a "name=setuptools"
-
-ansible vm_hosts \
-        -i ${MNAIO_INVENTORY:-"playbooks/inventory"} \
-        -m pip \
         -a "name=netaddr"
 
 export MNAIO_ANSIBLE_PARAMETERS=${MNAIO_ANSIBLE_PARAMETERS:-""}
