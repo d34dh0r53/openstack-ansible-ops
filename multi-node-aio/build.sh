@@ -21,6 +21,7 @@ source ansible-env.rc
 
 ansible vm_hosts \
         -i ${MNAIO_INVENTORY:-"playbooks/inventory"} \
+        -e "ansible_python_interpreter=${ANSIBLE_PYTHON_INTERPRETER:-/root/.pyenv/shims/python}" \
         -m pip \
         -a "name=netaddr"
 
